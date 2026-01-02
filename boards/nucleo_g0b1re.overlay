@@ -1,0 +1,38 @@
+&i2c1 {
+    status = "okay";
+    /* Force I2C to standard 100 kHz to avoid timing-related NACKs on some boards */
+    clock-frequency = <I2C_BITRATE_STANDARD>;
+
+    lsm6@6a {
+        compatible = "st,lsm6dsl";
+        reg = <0x6a>;
+        label = "LSM6";
+        status = "okay";
+    };
+
+    /* LIS3MDL node removed: using MMC56X3 for magnetometer in this build */
+
+    mmc56x3@30 {
+        compatible = "memsic,mmc56x3";
+        reg = <0x30>;             /* 7-bit I2C address */
+        label = "MMC56X3";
+        magn-odr = <100>;        /* ODR en Hz, 0 = désactivé (temp non-disponible en cont.) */
+        auto-self-reset;         /* active auto self reset (recommandé) */
+        status = "okay";
+    };
+};
+
+&usart1 {
+    status = "okay";
+    current-speed = <9600>;
+    parity = "none";
+    stop-bits = "1";
+    data-bits = <8>;
+    hw-flow-control;
+
+    /* GNSS device: generic NMEA parser attached to this UART */
+    neo_7m: gnss-nmea-generic {
+        compatible = "gnss-nmea-generic";
+        label = "GNSS_UBLOX_NEO7M";
+    };
+};
