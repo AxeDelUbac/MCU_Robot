@@ -14,10 +14,26 @@
 
     mmc56x3@30 {
         compatible = "memsic,mmc56x3";
-        reg = <0x30>;             /* 7-bit I2C address */
+        reg = <0x30>;
         label = "MMC56X3";
-        magn-odr = <100>;        /* ODR en Hz, 0 = désactivé (temp non-disponible en cont.) */
-        auto-self-reset;         /* active auto self reset (recommandé) */
+        magn-odr = <100>;
+        auto-self-reset;
+        status = "okay";
+    };
+
+    /* Capteur environnemental : température, humidité, pression, qualité d'air */
+    bme680@76 {
+        compatible = "bosch,bme680";
+        reg = <0x76>;
+        label = "BME680";
+        status = "okay";
+    };
+
+    /* Capteur de luminosité */
+    bh1750@23 {
+        compatible = "rohm,bh1750";
+        reg = <0x23>;
+        label = "BH1750";
         status = "okay";
     };
 };

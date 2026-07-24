@@ -3,6 +3,8 @@
 #include <zephyr/drivers/gnss.h>
 #include "RTOS.h"
 #include "positionManagement/PositionOrientation.h"
+#include "sensorManagement/environmentalSensor.h"
+#include "sensorManagement/lightSensor.h"
 
 LOG_MODULE_DECLARE(g0b1re, LOG_LEVEL_INF);
 
@@ -65,8 +67,21 @@ static void gnss_data_cb(const struct device *dev, const struct gnss_data *data)
 
 GNSS_DT_DATA_CALLBACK_DEFINE(DT_NODELABEL(neo_7m), gnss_data_cb);
 
+void sensorTask(void *p1, void *p2, void *p3)
+{
+    environmentalSensor_begin();
+    lightSensor_begin();
+
+    while (1) {
+        environmentalSensor_debug();
+        lightSensor_debug();
+        k_sleep(K_MSEC(2000));
+    }
+}
+
 K_THREAD_DEFINE(motor_regulation_id, 2048, MotorRegulationTask, NULL, NULL, NULL, 3, 0, 0);
 K_THREAD_DEFINE(speed_mesurement_id, 1024, speedMesurementTask,  NULL, NULL, NULL, 5, 0, 0);
 K_THREAD_DEFINE(imu_task_id,         1024, IMUTask,              NULL, NULL, NULL, 5, 0, 0);
 K_THREAD_DEFINE(gnss_id,             1024, gnss_task,            NULL, NULL, NULL, 4, 0, 0);
+K_THREAD_DEFINE(sensor_task_id,      2048, sensorTask,           NULL, NULL, NULL, 5, 0, 0);
 

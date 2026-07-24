@@ -8,4 +8,7 @@ target_sources(app PRIVATE
   src/RTOS.c
   src/positionManagement/Imu.c
   src/positionManagement/PositionOrientation.c
+  src/sensorManagement/sensorManagement.c
+  src/sensorManagement/environmentalSensor.c
+  src/sensorManagement/lightSensor.c
 )
