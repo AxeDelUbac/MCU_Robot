@@ -17,7 +17,7 @@ west sdk install
 # construction projet avec carte
 
 # build
-west build -b nucleo_g0b1re samples/hello_world/
+west build -b nucleo_g0b1re /home/maxence/Documents/Dev/MCU_Robot
 
 # flash
 west flash

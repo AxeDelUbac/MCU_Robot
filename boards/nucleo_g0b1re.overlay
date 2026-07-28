@@ -1,3 +1,19 @@
+/*
+ * Encodeurs rotatifs — 4 roues mecanum
+ * PINS ARBITRAIRES : à adapter selon le câblage réel
+ *   FL : PB3 (D3)  FR : PB5 (D4)
+ *   RL : PB4 (D5)  RR : PB10 (D6)
+ */
+/ {
+    wheel_encoders {
+        compatible = "gpio-keys";
+        enc_fl: encoder_fl { gpios = <&gpiob 3  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>; };
+        enc_fr: encoder_fr { gpios = <&gpiob 5  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>; };
+        enc_rl: encoder_rl { gpios = <&gpiob 4  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>; };
+        enc_rr: encoder_rr { gpios = <&gpiob 10 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>; };
+    };
+};
+
 &i2c1 {
     status = "okay";
     /* Force I2C to standard 100 kHz to avoid timing-related NACKs on some boards */
@@ -38,13 +54,31 @@
     };
 };
 
+/*
+ * Liaison UART vers le SBC Linux embarqué (DataCommunication)
+ *   TEMPORAIRE : placée sur USART1 (connecteur Arduino D0/D1, PC4/PC5) pour
+ *   faciliter les tests — normalement occupé par le GNSS, permuté avec l'USART3.
+ */
 &usart1 {
     status = "okay";
+    current-speed = <115200>;
+    parity = "none";
+    stop-bits = "1";
+    data-bits = <8>;
+};
+
+/*
+ * GNSS — TEMPORAIREMENT déplacé sur USART3 (PC10/PC11) le temps de tester
+ * la liaison DataCommunication sur le connecteur Arduino (USART1).
+ */
+&usart3 {
+    pinctrl-0 = <&usart3_tx_pc10 &usart3_rx_pc11>;
+    pinctrl-names = "default";
     current-speed = <9600>;
     parity = "none";
     stop-bits = "1";
     data-bits = <8>;
-    hw-flow-control;
+    status = "okay";
 
     /* GNSS device: generic NMEA parser attached to this UART */
     neo_7m: gnss-nmea-generic {
