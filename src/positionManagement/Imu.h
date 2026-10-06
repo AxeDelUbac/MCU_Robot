@@ -31,5 +31,6 @@ typedef struct {
 
 extern ImuData_t       imuData;
 extern ImuOrientation_t imuOrientation;
+void Imu_getTelemetrySnapshot(ImuData_t *data, ImuOrientation_t *orientation);
 
 #endif /* IMU_H */

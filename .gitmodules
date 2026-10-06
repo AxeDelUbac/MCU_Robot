@@ -1,0 +1,4 @@
+[submodule "modules/micro_ros_zephyr_module"]
+	path = modules/micro_ros_zephyr_module
+	url = https://github.com/micro-ROS/micro_ros_zephyr_module.git
+	branch = jazzy

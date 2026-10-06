@@ -19,70 +19,80 @@
     /* Force I2C to standard 100 kHz to avoid timing-related NACKs on some boards */
     clock-frequency = <I2C_BITRATE_STANDARD>;
 
-    lsm6@6a {
-        compatible = "st,lsm6dsl";
+    iks4a1_imu: lsm6dso16is@6a {
+        compatible = "st,lsm6dso16is";
         reg = <0x6a>;
-        label = "LSM6";
-        status = "okay";
+        accel-odr = <0x04>;
+        gyro-odr = <0x04>;
     };
 
-    /* LIS3MDL node removed: using MMC56X3 for magnetometer in this build */
-
-    mmc56x3@30 {
-        compatible = "memsic,mmc56x3";
-        reg = <0x30>;
-        label = "MMC56X3";
-        magn-odr = <100>;
-        auto-self-reset;
-        status = "okay";
+    iks4a1_magn: lis2mdl@1e {
+        compatible = "st,lis2mdl";
+        reg = <0x1e>;
     };
 
-    /* Capteur environnemental : température, humidité, pression, qualité d'air */
-    bme680@76 {
-        compatible = "bosch,bme680";
-        reg = <0x76>;
-        label = "BME680";
-        status = "okay";
-    };
-
-    /* Capteur de luminosité */
-    bh1750@23 {
-        compatible = "rohm,bh1750";
-        reg = <0x23>;
-        label = "BH1750";
-        status = "okay";
+    iks4a1_lps22df: lps22df@5d {
+        compatible = "st,lps22df";
+        reg = <0x5d>;
+        odr = <1>;
     };
 };
 
 /*
- * Liaison UART vers le SBC Linux embarqué (DataCommunication)
- *   TEMPORAIRE : placée sur USART1 (connecteur Arduino D0/D1, PC4/PC5) pour
- *   faciliter les tests — normalement occupé par le GNSS, permuté avec l'USART3.
+ * GNSS1A1 : cavaliers d'usine J3/J4, donc UART sur D8/D2 (PA9/PA10).
  */
 &usart1 {
-    status = "okay";
-    current-speed = <115200>;
-    parity = "none";
-    stop-bits = "1";
-    data-bits = <8>;
-};
-
-/*
- * GNSS — TEMPORAIREMENT déplacé sur USART3 (PC10/PC11) le temps de tester
- * la liaison DataCommunication sur le connecteur Arduino (USART1).
- */
-&usart3 {
-    pinctrl-0 = <&usart3_tx_pc10 &usart3_rx_pc11>;
+    pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10>;
     pinctrl-names = "default";
     current-speed = <9600>;
     parity = "none";
     stop-bits = "1";
     data-bits = <8>;
     status = "okay";
+};
 
-    /* GNSS device: generic NMEA parser attached to this UART */
-    neo_7m: gnss-nmea-generic {
+&arduino_serial {
+    teseo_liv3f: gnss-nmea-generic {
         compatible = "gnss-nmea-generic";
-        label = "GNSS_UBLOX_NEO7M";
+        status = "okay";
+    };
+};
+
+/*
+ * Liaison micro-ROS vers l'agent ROS 2 sur le SBC Linux, via USART3.
+ * Les broches PC10/PC11 doivent être raccordées au SBC (TX vers RX, RX vers TX).
+ */
+&usart3 {
+    pinctrl-0 = <&usart3_tx_pc10 &usart3_rx_pc11>;
+    pinctrl-names = "default";
+    current-speed = <115200>;
+    parity = "none";
+    stop-bits = "1";
+    data-bits = <8>;
+    status = "okay";
+};
+
+/* D13/PA5 est aussi l'horloge SPI1 sur cette Nucleo : le GNSS utilise D13 pour WAKEUP. */
+&spi1 {
+    status = "disabled";
+};
+
+/*
+ * Cavaliers GNSS1A1 par défaut : RESET sur D7 (PA8, actif bas) et WAKEUP
+ * sur D13 (PA5, actif haut). D13 partage PA5 avec la LED utilisateur LD4.
+ */
+&gpioa {
+    gnss_reset_inactive: gnss-reset-inactive {
+        gpio-hog;
+        gpios = <8 GPIO_ACTIVE_HIGH>;
+        output-high;
+        line-name = "GNSS RESET inactive";
+    };
+
+    gnss_wakeup: gnss-wakeup {
+        gpio-hog;
+        gpios = <5 GPIO_ACTIVE_HIGH>;
+        output-high;
+        line-name = "GNSS WAKEUP";
     };
 };

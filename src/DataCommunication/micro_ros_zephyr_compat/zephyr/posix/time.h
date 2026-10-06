@@ -1,0 +1,6 @@
+#ifndef MICRO_ROS_ZEPHYR_POSIX_TIME_COMPAT_H
+#define MICRO_ROS_ZEPHYR_POSIX_TIME_COMPAT_H
+
+#include <time.h>
+
+#endif
