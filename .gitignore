@@ -1,5 +1,6 @@
 /zephyr/*
 /build/*
 /.vscode/*
+boards/*.code-workspace
 .venv/*
 .claude/*

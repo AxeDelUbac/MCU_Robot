@@ -1,7 +1,0 @@
-{
-    "devicetree.zephyr": {
-        "$mid": 1,
-        "path": "/home/maxence/zephyrproject/zephyr",
-        "scheme": "file"
-    }
-}
